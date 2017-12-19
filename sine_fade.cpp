@@ -1,24 +1,15 @@
-#define MINIMUM 0
-#define MAXIMUM 120
-#define PERIOD 10000
-#define TICK_DELAY 50
-
 #include "Arduino.h"
+#include "sine_oscillator.h"
 
-int counter_increment_per_tick(int period, int tick_delay){
- return (period / tick_delay) * 2 * PI;
-}
+#define MINIMUM 40
+#define MAXIMUM 160
+#define PERIOD 2000
+#define TICK_DELAY 10
 
-int oscillator(float counter, int range, float phase_shift){
-  return range - ((range + sin(counter + phase_shift) * range) / 2);
-}
+const float phase_shifts[6] = {0, PI/3, 2*PI/3, PI, 4 * PI/3, 5 *PI/3};
 
-void pulsed_led_values(float counter, int range, int *return_array){
-  float phase_shift = 0.0;
-  for(int i=0;i<6;i++) {
-    return_array[i] = oscillator(counter, range, phase_shift);
-    phase_shift += PI/6;
-   }
+float counter_increment_per_tick(int period, int tick_delay){
+ return (2 * PI) / (period / tick_delay);
 }
 
 void sine_fade(int *return_array,int *tick_delay) {
@@ -26,7 +17,8 @@ void sine_fade(int *return_array,int *tick_delay) {
   if (counter > 1000000 || counter < -1000000) {
     counter = 0.0;
   }
-  pulsed_led_values(counter, MAXIMUM-MINIMUM, return_array);
+  return_array = phased_led_values(return_array, counter, MAXIMUM-MINIMUM, phase_shifts);
+  float phase_shift = 0.0;
   counter += counter_increment_per_tick(PERIOD, TICK_DELAY);
   *tick_delay = TICK_DELAY;
 }

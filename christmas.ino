@@ -1,9 +1,10 @@
 #include "sine_fade.h"
 #include "even_odd.h"
 #include "binary_count.h"
+#include "twinkle.h"
 
 
-void (*effects[3]) (int*, int*) = {&sine_fade, &binary_count, &even_odd};
+void (*effects[4]) (int*, int*) = {&sine_fade, &binary_count, &even_odd, &twinkle};
 volatile int effect_index;
 
 void setup() {
@@ -12,7 +13,7 @@ void setup() {
  Serial.begin(9600);
  randomSeed(analogRead(0));
  pinMode(2, INPUT_PULLUP);
- attachInterrupt(0, next_effect, FALLING);
+ attachInterrupt(0, next_effect, RISING);
  effect_index = 0;
 }
 
@@ -22,7 +23,7 @@ void loop() {
 
 void next_effect()
   {
-    if (effect_index == 2){
+    if (effect_index == 3){
       effect_index = 0;
     }else{
       effect_index++;
